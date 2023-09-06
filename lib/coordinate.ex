@@ -8,7 +8,7 @@ defmodule IslandEngine.Coordinate do
 
   @spec start_link :: {:error, any} | {:ok, pid} | {:already_started, pid}
   @doc """
-  Agent acts as temporary server to store the coordinates (state) over longer periods. Start_link starts up and links agent process
+  Agent acts as temporary server to store the coordinates (state) over longer periods. Start_link starts up and links agent process. Returns a tuple
   """
   def start_link() do
     Agent.start_link(fn -> %Coordinate{} end)
@@ -16,10 +16,21 @@ defmodule IslandEngine.Coordinate do
 
   @spec guessed?(atom | pid | {atom, any} | {:via, atom, any}) :: atom
   def guessed?(coordinate) do
-    Agent.get(coordinate, fn state -> state.guess? end)
+    Agent.get(coordinate, fn state -> state.guessed? end)
   end
 
   def island(coordinate) do
     Agent.get(coordinate, fn state -> state.in_island end)
+  end
+
+  def in_island?(coordinate) do
+    case island(coordinate) do
+      :none -> false
+      _ -> true
+    end
+  end
+
+  def hit(coordinate) do
+    in_island?(coordinate) && guessed?(coordinate)
   end
 end
