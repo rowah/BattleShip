@@ -19,10 +19,12 @@ defmodule IslandEngine.Coordinate do
     Agent.get(coordinate, fn state -> state.guessed? end)
   end
 
+  @spec island(pid) :: atom | boolean
   def island(coordinate) do
     Agent.get(coordinate, fn state -> state.in_island end)
   end
 
+  @spec in_island?(pid) :: boolean
   def in_island?(coordinate) do
     case island(coordinate) do
       :none -> false
@@ -30,6 +32,7 @@ defmodule IslandEngine.Coordinate do
     end
   end
 
+  @spec hit(pid) :: boolean
   def hit(coordinate) do
     in_island?(coordinate) && guessed?(coordinate)
   end
