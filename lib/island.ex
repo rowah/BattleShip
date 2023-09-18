@@ -1,11 +1,9 @@
 defmodule IslandEngine.Island do
-  alias IslandEngine.Coordinate
+  alias IslandEngine.{Coordinate, Island}
 
-  def start_link() do
-    Agent.start_link(fn -> [] end)
-  end
+  @enforce_keys [:coordinates, :hit_coordinates]
+  defstruct [:coordinates, :hit_coordinates]
 
-  def replace_coordinates(island, new_coordinates) when is_list(new_coordinates) do
-    Agent.update(island, fn _state -> new_coordinates end)
-  end
+  def new(), do:
+    %Island{coordinates: MapSet.new(), hit_coordinates: MapSet.new()}
 end
