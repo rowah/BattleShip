@@ -32,7 +32,7 @@ defmodule IslandEngine.Island do
       {:ok, coordinate} ->
         {:cont, MapSet.put(coordinates, coordinate)}
 
-      {:error, invalid_coordinate} ->
+      {:error, :invalid_coordinate} ->
         {:halt, {:error, :invalid_coordinate}}
     end
   end
