@@ -15,7 +15,7 @@ defmodule IslandEngine.Island do
 
   defp offset(:square), do: [{0, 0}, {0, 1}, {1, 0}, {1, 1}]
   defp offset(:atoll), do: [{0, 0}, {0, 1}, {1, 1}, {2, 0}, {2, 1}]
-  defp offset(:dot), do: [0, 0]
+  defp offset(:dot), do: [{0, 0}]
   defp offset(:l_shape), do: [{0, 0}, {1, 0}, {2, 0}, {2, 1}]
   defp offset(:s_shape), do: [{0, 1}, {0, 2}, {1, 0}, {1, 1}]
   defp offset(_), do: [:error, :invalid_island_type]
@@ -36,4 +36,7 @@ defmodule IslandEngine.Island do
         {:halt, {:error, :invalid_coordinate}}
     end
   end
+
+  def overlaps?(existing_island, new_island),
+    do: not MapSet.disjoint?(existing_island.coordinates, new_island.coordinates)
 end
