@@ -1,5 +1,5 @@
-defmodule IslandEngine.Island do
-  alias IslandEngine.{Coordinate, Island}
+defmodule IslandsEngine.Island do
+  alias IslandsEngine.{Coordinate, Island}
 
   @enforce_keys [:coordinates, :hit_coordinates]
   defstruct [:coordinates, :hit_coordinates]
@@ -52,4 +52,6 @@ defmodule IslandEngine.Island do
   end
 
   def forested?(island), do: MapSet.equal?(island.coordinates, island.hit_coordinates)
+
+  def types(), do: [:atoll, :dot, :l_shape, :s_shape, :square]
 end
