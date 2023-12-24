@@ -1,4 +1,7 @@
 defmodule IslandsEngine.Coordinate do
+  @moduledoc """
+  This is the Coordinate module. It returns a tuple of atom :ok and a coordinate struct with a row and columns keys with values of between 1 and 10
+  """
   alias __MODULE__
 
   @board_range 1..10

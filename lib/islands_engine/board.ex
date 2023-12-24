@@ -1,26 +1,30 @@
 defmodule IslandsEngine.Board do
-  @moduledoc """
-  This is the Hello module.
-  """
-  @moduledoc since: "1.0.0"
+  @moduledoc false
 
   alias IslandsEngine.{Coordinate, Island}
 
-  def new(), do: %{}
-
   @doc """
-  Says hello to the given `name`.
+  Gives a game board.
 
-  Returns `:ok`.
+  Returns `%{}`.
 
   ## Examples
 
-      iex> MyApp.Hello.world(:john)
-      :ok
+      iex> IslandEngine.Board.new()
+      %{}
 
   """
+  def new(), do: %{}
 
-  # The front end of the application passes down an atom key representing the type of the island, as well as the row and column of the starting coordinate
+  @doc """
+  This function takes a game board, a key, and an island to be positioned on the board.
+  It checks if the new island overlaps with any existing islands on the board. If there
+  is an overlap, it returns `{:error, :overlapping_island}`. Otherwise, it updates the
+  board by adding the new island at the specified key and returns the updated board. The front end of the application passes down an atom key representing the type of the island, as well as the row and column of the starting coordinate
+
+  ## Examples
+
+  """
   def position_island(board, key, %Island{} = island) do
     case overlaps_existing_island?(board, key, island) do
       true ->
@@ -40,9 +44,9 @@ defmodule IslandsEngine.Board do
   def all_islands_positioned?(board), do: Enum.all?(Island.types(), &Map.has_key?(board, &1))
 
   @doc """
-  Says hello to the given `name`.
+  whether the guess was a hit or a miss, either :none or the type of island that was forested, :win or :no_win, and finally the board map itself
 
-  Returns `:ok`.
+  Returns ``.
 
   ## Examples
 
@@ -50,8 +54,6 @@ defmodule IslandsEngine.Board do
       :ok
 
   """
-
-  # whether the guess was a hit or a miss, either :none or the type of island that was forested, :win or :no_win, and finally the board map itself
   def guess(board, %Coordinate{} = coordinate) do
     board
     |> check_all_islands(coordinate)

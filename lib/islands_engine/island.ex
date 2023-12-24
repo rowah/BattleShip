@@ -1,9 +1,23 @@
 defmodule IslandsEngine.Island do
+  @moduledoc """
+  This is the Island module.
+  """
   alias IslandsEngine.{Coordinate, Island}
 
   @enforce_keys [:coordinates, :hit_coordinates]
   defstruct [:coordinates, :hit_coordinates]
 
+  @doc """
+  Gives a game board.
+
+  Returns `%{:ok, %IslandEngine.Island{}}`.
+
+  ## Examples
+
+      iex> IslandEngine.Island.new()
+      %{}
+
+  """
   def new(type, %Coordinate{} = upper_left) do
     with [_ | _] = offsets <- offset(type),
          %MapSet{} = coordinates <- add_coordinates(offsets, upper_left) do
