@@ -32,14 +32,11 @@ defmodule IslandEngine.Game do
 
   def handle_call({:position_island, player, key, row, col}, _from, state_data) do
     board = player_board(state_data, player)
-    IO.inspect(board)
 
-    with {:ok, rules} <- Rules.check(state_data.rules, :position_island),
+    with {:ok, rules} <- Rules.check(state_data.rules, {:position_islands, player}),
          {:ok, coordinate} <- Coordinate.new(row, col),
          {:ok, island} <- Island.new(key, coordinate),
          %{} = board <- Board.position_island(board, key, island) do
-      IO.inspect("Grut")
-
       state_data
       |> update_board(player, board)
       |> update_rules(rules)
@@ -56,8 +53,6 @@ defmodule IslandEngine.Game do
 
       {:error, :overlapping_island} ->
         {:error, {:error, :overlapping_island}, state_data}
-
-        IO.inspect("Else Grut")
     end
   end
 
