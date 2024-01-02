@@ -1,19 +1,42 @@
 defmodule IslandEngine.Game do
-  alias IslandsEngine.{Board, Coordinate, Guesses, Island}
-  alias IslandEngine.Rules
+  @moduledoc false
 
   use GenServer
 
+  alias IslandsEngine.{Board, Coordinate, Guesses, Island}
+  alias IslandEngine.Rules
+
   @players [:player1, :player2]
 
-  def start_link(name) when is_binary(name), do: GenServer.start_link(__MODULE__, name, [])
+  @spec start_link(binary()) :: :ignore | {:ok, pid()}
+  def start_link(name) when is_binary(name) do
+    case GenServer.start_link(__MODULE__, name, []) do
+      {:ok, pid} ->
+        {:ok, pid}
 
+      {:error, {:already_started, _pid}} ->
+        :ignore
+    end
+  end
+
+  @spec init(any()) ::
+          {:ok,
+           %{
+             player1: %{board: map(), guesses: map(), name: String.t()},
+             player2: %{board: map(), guesses: map(), name: nil},
+             rules: %IslandEngine.Rules{
+               player1: :islands_not_set,
+               player2: :islands_not_set,
+               state: :initialized
+             }
+           }}
   def init(name) do
     player1 = %{name: name, board: Board.new(), guesses: Guesses.new()}
     player2 = %{name: nil, board: Board.new(), guesses: Guesses.new()}
     {:ok, %{player1: player1, player2: player2, rules: %Rules{}}}
   end
 
+  @spec add_player(pid(), binary()) :: :error | {:reply, :ok, %{}}
   def add_player(game, name) when is_binary(name), do: GenServer.call(game, {:add_player, name})
 
   def position_island(game, player, key, row, col) when player in @players,
@@ -22,6 +45,12 @@ defmodule IslandEngine.Game do
   def set_islands(game, player) when player in @players,
     do: GenServer.call(game, {:set_islands, player})
 
+  @spec guess_coordinate(
+          pid(),
+          String.t(),
+          integer(),
+          integer()
+        ) :: :error | {:reply, :ok, %{}}
   def guess_coordinate(game, player, row, col),
     do: GenServer.call(game, {:guess_coordinate, player, row, col})
 
