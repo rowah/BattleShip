@@ -8,9 +8,12 @@ defmodule IslandEngine.Game do
 
   @players [:player1, :player2]
 
-  @spec start_link(binary()) :: :ignore | {:ok, pid()}
+  @spec via_tuple(String.t()) :: {:via, Registry, {Registry.Game, String.t()}}
+  def via_tuple(name), do: {:via, Registry, {Registry.Game, name}}
+
+  @spec start_link(binary()) :: {:ok, pid()} | :ignore
   def start_link(name) when is_binary(name) do
-    case GenServer.start_link(__MODULE__, name, []) do
+    case GenServer.start_link(__MODULE__, name, name: via_tuple(name)) do
       {:ok, pid} ->
         {:ok, pid}
 
@@ -19,7 +22,7 @@ defmodule IslandEngine.Game do
     end
   end
 
-  @spec init(any()) ::
+  @spec init(String.t()) ::
           {:ok,
            %{
              player1: %{board: map(), guesses: map(), name: String.t()},
