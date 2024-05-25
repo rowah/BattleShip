@@ -1,9 +1,9 @@
-defmodule IslandsEngine.MixProject do
+defmodule BattleShip.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :islands_engine,
+      app: :battle_ship,
       version: "0.1.0",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
@@ -15,7 +15,7 @@ defmodule IslandsEngine.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {IslandsEngine.Application, []}
+      mod: {BattleShip.Application, []}
     ]
   end
 

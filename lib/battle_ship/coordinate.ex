@@ -1,4 +1,4 @@
-defmodule IslandsEngine.Coordinate do
+defmodule BattleShip.Coordinate do
   @moduledoc """
   This is the Coordinate module. It returns a tuple of atom :ok and a coordinate struct with a row and columns keys with values of between 1 and 10
   """

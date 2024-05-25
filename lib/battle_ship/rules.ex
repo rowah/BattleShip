@@ -1,16 +1,16 @@
-defmodule IslandEngine.Rules do
+defmodule BattleShip.Rules do
   @moduledoc """
   This is the Rules module.
   """
   alias __MODULE__
 
   defstruct state: :initialized,
-            player1: :islands_not_set,
-            player2: :islands_not_set
+            player1: :ships_not_set,
+            player2: :ships_not_set
 
-  @spec new() :: %IslandEngine.Rules{
-          player1: :islands_not_set,
-          player2: :islands_not_set,
+  @spec new() :: %BattleShip.Rules{
+          player1: :ships_not_set,
+          player2: :ships_not_set,
           state: :initialized
         }
   @doc """
@@ -20,11 +20,11 @@ defmodule IslandEngine.Rules do
 
   ## Examples
 
-      iex> IslandEngine.Island.new()
-      %IslandEngine.Rules{
+      iex> BattleShip.Ship.new()
+      %BattleShip.Rules{
       state: :initialized,
-      player1: :islands_not_set,
-      player2: :islands_not_set
+      player1: :ships_not_set,
+      player2: :ships_not_set
       }
 
   """
@@ -37,7 +37,7 @@ defmodule IslandEngine.Rules do
 
   ## Examples
 
-      iex> IslandEngine.Island.check(%Rules{state: :initialized} = rules, :add_player)
+      iex> BattleShip.Ship.check(%Rules{state: :initialized} = rules, :add_player)
       {:ok, %Rules{rules | state: :players_set}}
 
   """
@@ -46,18 +46,18 @@ defmodule IslandEngine.Rules do
     {:ok, %Rules{rules | state: :players_set}}
   end
 
-  def check(%Rules{state: :players_set} = rules, {:position_islands, player}) do
+  def check(%Rules{state: :players_set} = rules, {:position_ships, player}) do
     case Map.fetch!(rules, player) do
-      # If the value for the player key is :islands_not_set, it’s fine for that player to move her islands, so we return {:ok, rules}. If the values is :islands_set, it’s not okay for her to move her islands, so we return :error
-      :islands_set -> :error
-      :islands_not_set -> {:ok, rules}
+      # If the value for the player key is :ships_not_set, it’s fine for that player to move her ships, so we return {:ok, rules}. If the values is :ships_set, it’s not okay for her to move her ships, so we return :error
+      :ships_set -> :error
+      :ships_not_set -> {:ok, rules}
     end
   end
 
-  def check(%Rules{state: :players_set} = rules, {:set_islands, player}) do
-    rules = Map.put(rules, player, :islands_set)
+  def check(%Rules{state: :players_set} = rules, {:set_ships, player}) do
+    rules = Map.put(rules, player, :ships_set)
 
-    case both_players_islands_set?(rules) do
+    case both_players_ships_set?(rules) do
       true ->
         {:ok, %Rules{rules | state: :player1_turn}}
 
@@ -88,6 +88,6 @@ defmodule IslandEngine.Rules do
 
   def check(_state, _action), do: :error
 
-  defp both_players_islands_set?(rules),
-    do: rules.player1 == :islands_set && rules.player2 == :islands_set
+  defp both_players_ships_set?(rules),
+    do: rules.player1 == :ships_set && rules.player2 == :ships_set
 end

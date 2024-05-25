@@ -1,6 +1,6 @@
-defmodule IslandsEngine do
+defmodule BattleShip do
   @moduledoc """
-  Documentation for `IslandsEngine`.
+  Documentation for `BattleShip`.
   """
 
   @doc """
@@ -8,7 +8,7 @@ defmodule IslandsEngine do
 
   ## Examples
 
-      iex> IslandsEngine.hello()
+      iex> BattleShip.hello()
       :world
 
   """
