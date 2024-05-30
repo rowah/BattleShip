@@ -3,6 +3,7 @@ defmodule BattleShip.Board do
 
   alias BattleShip.{Coordinate, Ship}
 
+  @spec new() :: %{}
   @doc """
   Gives a game board.
 
