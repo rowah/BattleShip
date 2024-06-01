@@ -8,11 +8,7 @@ defmodule BattleShip.Rules do
             player1: :ships_not_set,
             player2: :ships_not_set
 
-  @spec new() :: %BattleShip.Rules{
-          player1: :ships_not_set,
-          player2: :ships_not_set,
-          state: :initialized
-        }
+  @spec new() :: struct()
   @doc """
   Gives game rules.
 
@@ -28,8 +24,16 @@ defmodule BattleShip.Rules do
       }
 
   """
-  def new(), do: %Rules{}
+  def new, do: %Rules{}
 
+  @spec check(struct(), atom()) ::
+          :error
+          | {:ok,
+             %{
+               :__struct__ => BattleShip.Rules,
+               :state => :game_over | :player1_turn | :player2_turn | :players_set | :ships_set,
+               optional(any()) => any()
+             }}
   @doc """
   Gives game rules and transitions states and actions. Pattern matches for the current game state and actions possible in that state. For any state/event combination that ends up in catchall, we don’t want to transition the state.
 
@@ -42,13 +46,11 @@ defmodule BattleShip.Rules do
 
   """
   def check(%Rules{state: :initialized} = rules, :add_player) do
-    # It makes a decision about whether it’s okay to add another player based on the current state of the game. Does not actually add a player. Calling the check/2 function with :add_player when we’re in the :initialized state returns {:ok, <new rules>} and moves us into the :players_set state
     {:ok, %Rules{rules | state: :players_set}}
   end
 
   def check(%Rules{state: :players_set} = rules, {:position_ships, player}) do
     case Map.fetch!(rules, player) do
-      # If the value for the player key is :ships_not_set, it’s fine for that player to move her ships, so we return {:ok, rules}. If the values is :ships_set, it’s not okay for her to move her ships, so we return :error
       :ships_set -> :error
       :ships_not_set -> {:ok, rules}
     end

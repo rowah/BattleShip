@@ -1,5 +1,6 @@
 defmodule BattleShip.DemoProc do
-  def loop() do
+  @moduledoc false
+  def loop do
     receive do
       msg -> IO.puts("I received message: #{msg}")
     end

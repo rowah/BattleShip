@@ -85,5 +85,5 @@ defmodule BattleShip.Ship do
   def sunk?(ship), do: MapSet.equal?(ship.coordinates, ship.hit_coordinates)
 
   @spec types() :: [:atoll | :dot | :l_shape | :s_shape | :square]
-  def types(), do: [:atoll, :dot, :l_shape, :s_shape, :square]
+  def types, do: [:atoll, :dot, :l_shape, :s_shape, :square]
 end
