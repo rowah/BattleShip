@@ -23,7 +23,7 @@ defmodule BattleShip.MixProject do
         sobelow: :test
       ],
       test_coverage: [tool: ExCoveralls],
-      dialyzer: [plt_add_apps: [:ex_unit, :mix], ignore_warnings: "config/dialyzer.ignore"]
+      dialyzer: [plt_add_apps: [:ex_unit, :mix], ignore_warnings: ".dialyzer_ignore.exs"]
     ]
   end
 

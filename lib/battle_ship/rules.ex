@@ -26,7 +26,7 @@ defmodule BattleShip.Rules do
   """
   def new, do: %Rules{}
 
-  @spec check(struct(), atom()) ::
+  @spec check(struct(), atom() | tuple()) ::
           :error
           | {:ok,
              %{
@@ -35,7 +35,8 @@ defmodule BattleShip.Rules do
                optional(any()) => any()
              }}
   @doc """
-  Gives game rules and transitions states and actions. Pattern matches for the current game state and actions possible in that state. For any state/event combination that ends up in catchall, we don’t want to transition the state.
+  Gives game rules and transitions states and actions. Pattern matches for the current game state and actions possible in that state.
+  For any state/event combination that ends up in catchall, we don’t want to transition the state and so :error is returned.
 
   Returns `{:ok, rules}`.
 
@@ -50,13 +51,17 @@ defmodule BattleShip.Rules do
   end
 
   def check(%Rules{state: :players_set} = rules, {:position_ships, player}) do
+    # state remains the same
     case Map.fetch!(rules, player) do
+      # can no longer reposition ships
       :ships_set -> :error
+      # can still reposition ships
       :ships_not_set -> {:ok, rules}
     end
   end
 
   def check(%Rules{state: :players_set} = rules, {:set_ships, player}) do
+    # sets ships for player and moves state if both player's ships are set
     rules = Map.put(rules, player, :ships_set)
 
     case both_players_ships_set?(rules) do
@@ -88,6 +93,7 @@ defmodule BattleShip.Rules do
     end
   end
 
+  # catch all state, eg when player1 tries to guess a coordinate when the state is in player2's turn
   def check(_state, _action), do: :error
 
   defp both_players_ships_set?(rules),
