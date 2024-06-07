@@ -43,11 +43,11 @@ defmodule BattleShip.Board do
     end)
   end
 
-  @spec all_ships_positioned?(map()) :: boolean()
-  def all_ships_positioned?(board), do: Enum.all?(Ship.types(), &Map.has_key?(board, &1))
+  @spec all_ships_set?(map()) :: boolean()
+  def all_ships_set?(board), do: Enum.all?(Ship.types(), &Map.has_key?(board, &1))
 
   @spec guess(map(), struct()) ::
-          {:hit, boolean(), :no_win | :win, map()} | {:miss, :none, :no_win, map()}
+          {:hit | :miss, boolean(), :no_win | :win, map()} | {:miss, :none, :no_win, map()}
   @doc """
   whether the guess was a hit or a miss, either :none or the type of ship that was sunk, :win or :no_win, and finally the board map itself
 
