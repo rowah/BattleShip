@@ -1,10 +1,9 @@
-defmodule IslandEngine.Game do
+defmodule BattleShip.Game do
   @moduledoc false
 
   use GenServer
 
-  alias IslandsEngine.{Board, Coordinate, Guesses, Island}
-  alias IslandEngine.Rules
+  alias BattleShip.{Board, Coordinate, Guesses, Rules, Ship}
 
   @players [:player1, :player2]
 
@@ -27,11 +26,7 @@ defmodule IslandEngine.Game do
            %{
              player1: %{board: map(), guesses: map(), name: String.t()},
              player2: %{board: map(), guesses: map(), name: nil},
-             rules: %IslandEngine.Rules{
-               player1: :islands_not_set,
-               player2: :islands_not_set,
-               state: :initialized
-             }
+             rules: struct()
            }}
   def init(name) do
     player1 = %{name: name, board: Board.new(), guesses: Guesses.new()}
@@ -42,35 +37,35 @@ defmodule IslandEngine.Game do
   @spec add_player(pid(), binary()) :: :error | {:reply, :ok, %{}}
   def add_player(game, name) when is_binary(name), do: GenServer.call(game, {:add_player, name})
 
-  def position_island(game, player, key, row, col) when player in @players,
-    do: GenServer.call(game, {:position_island, player, key, row, col})
+  def position_ship(game, player, ship_key, row, col) when player in @players,
+    do: GenServer.call(game, {:position_ship, player, ship_key, row, col})
 
-  def set_islands(game, player) when player in @players,
-    do: GenServer.call(game, {:set_islands, player})
+  def set_ships(game, player) when player in @players,
+    do: GenServer.call(game, {:set_ships, player})
 
   @spec guess_coordinate(
           pid(),
-          String.t(),
+          atom(),
           integer(),
           integer()
         ) :: :error | {:reply, :ok, %{}}
-  def guess_coordinate(game, player, row, col),
+  def guess_coordinate(game, player, row, col) when player in @players,
     do: GenServer.call(game, {:guess_coordinate, player, row, col})
 
-  def handle_call({:guess_coordinate, player_key, row, col}, _from, state_data) do
-    opponent_key = opponent(player_key)
-    opponent_board = player_board(state_data, opponent_key)
+  def handle_call({:guess_coordinate, player, row, col}, _from, state_data) do
+    opponent = opponent(player)
+    opponent_board = player_board(state_data, opponent)
 
-    with {:ok, rules} <- Rules.check(state_data.rules, {:guess_coordinate, player_key}),
+    with {:ok, rules} <- Rules.check(state_data.rules, {:guess_coordinate, player}),
          {:ok, coordinate} <- Coordinate.new(row, col),
-         {hit_or_miss, forested_island, win_status, opponent_board} <-
+         {hit_or_miss, sunk_ship, win_status, opponent_board} <-
            Board.guess(opponent_board, coordinate),
          {:ok, rules} <- Rules.check(rules, {:win_check, win_status}) do
       state_data
-      |> update_board(opponent_key, opponent_board)
-      |> update_guesses(player_key, hit_or_miss, coordinate)
+      |> update_board(opponent, opponent_board)
+      |> update_guesses(player, coordinate, hit_or_miss)
       |> update_rules(rules)
-      |> reply_success({hit_or_miss, forested_island, win_status})
+      |> reply_success({hit_or_miss, sunk_ship, win_status})
     else
       :error ->
         {:reply, :error, state_data}
@@ -80,38 +75,40 @@ defmodule IslandEngine.Game do
     end
   end
 
-  def handle_call({:set_islands, player}, _from, state_data) do
+  def handle_call({:set_ships, player}, _from, state_data) do
     board = player_board(state_data, player)
 
-    with {:ok, rules} <- Rules.check(state_data.rules, {:set_islands, player}),
-         true <- Board.all_islands_positioned?(board) do
+    with {:ok, rules} <- Rules.check(state_data.rules, {:set_ships, player}),
+         true <- Board.all_ships_set?(board) do
       state_data
       |> update_rules(rules)
       |> reply_success({:ok, board})
     else
       :error -> {:reply, :error, state_data}
-      false -> {:reply, {:error, :not_all_islands_positioned}, state_data}
+      false -> {:reply, {:error, :not_all_ships_set}, state_data}
     end
   end
 
   def handle_call({:add_player, name}, _from, state_data) do
-    with {:ok, rules} <- Rules.check(state_data.rules, :add_player) do
-      state_data
-      |> update_player2_name(name)
-      |> update_rules(rules)
-      |> reply_success(:ok)
-    else
-      :error -> {:noreply, :error, state_data}
+    case Rules.check(state_data.rules, :add_player) do
+      {:ok, rules} ->
+        state_data
+        |> update_player2_name(name)
+        |> update_rules(rules)
+        |> reply_success(:ok)
+
+      :error ->
+        {:noreply, :error, state_data}
     end
   end
 
-  def handle_call({:position_island, player, key, row, col}, _from, state_data) do
+  def handle_call({:position_ship, player, ship_key, row, col}, _from, state_data) do
     board = player_board(state_data, player)
 
-    with {:ok, rules} <- Rules.check(state_data.rules, {:position_islands, player}),
+    with {:ok, rules} <- Rules.check(state_data.rules, {:position_ships, player}),
          {:ok, coordinate} <- Coordinate.new(row, col),
-         {:ok, island} <- Island.new(key, coordinate),
-         %{} = board <- Board.position_island(board, key, island) do
+         {:ok, ship} <- Ship.new(ship_key, coordinate),
+         %{} = board <- Board.position_ship(board, ship_key, ship) do
       state_data
       |> update_board(player, board)
       |> update_rules(rules)
@@ -123,11 +120,11 @@ defmodule IslandEngine.Game do
       {:error, :invalid_coordinate} ->
         {:reply, {:error, :invalid_coordinate}, state_data}
 
-      {:error, :invalid_island_type} ->
-        {:error, {:error, :invalid_island_type}, state_data}
+      {:error, :invalid_ship_type} ->
+        {:reply, {:error, :invalid_ship_type}, state_data}
 
-      {:error, :overlapping_island} ->
-        {:error, {:error, :overlapping_island}, state_data}
+      {:error, :overlapping_ship} ->
+        {:reply, {:error, :overlapping_ship}, state_data}
     end
   end
 
@@ -145,8 +142,8 @@ defmodule IslandEngine.Game do
   defp opponent(:player1), do: :player2
   defp opponent(:player2), do: :player1
 
-  defp update_guesses(state_data, player_key, hit_or_miss, coordinate) do
-    update_in(state_data[player_key].guesses, fn guesses ->
+  defp update_guesses(state_data, player, coordinate, hit_or_miss) do
+    update_in(state_data[player].guesses, fn guesses ->
       Guesses.add(guesses, hit_or_miss, coordinate)
     end)
   end
