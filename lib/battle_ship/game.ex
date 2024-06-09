@@ -1,7 +1,10 @@
 defmodule BattleShip.Game do
   @moduledoc false
 
-  use GenServer
+  use GenServer,
+    restart: :transient,
+    shutdown: 5000,
+    type: :worker
 
   alias BattleShip.{Board, Coordinate, Guesses, Rules, Ship}
 
