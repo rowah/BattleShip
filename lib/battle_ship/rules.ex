@@ -64,12 +64,10 @@ defmodule BattleShip.Rules do
     # sets ships for player and moves state if both player's ships are set
     rules = Map.put(rules, player, :ships_set)
 
-    case both_players_ships_set?(rules) do
-      true ->
-        {:ok, %Rules{rules | state: :player1_turn}}
-
-      false ->
-        {:ok, rules}
+    if both_players_ships_set?(rules) do
+      {:ok, %Rules{rules | state: :player1_turn}}
+    else
+      {:ok, rules}
     end
   end
 
@@ -96,6 +94,5 @@ defmodule BattleShip.Rules do
   # catch all state, eg when player1 tries to guess a coordinate when the state is in player2's turn
   def check(_state, _action), do: :error
 
-  defp both_players_ships_set?(rules),
-    do: rules.player1 == :ships_set && rules.player2 == :ships_set
+  defp both_players_ships_set?(rules), do: rules.player1 == :ships_set && rules.player2 == :ships_set
 end

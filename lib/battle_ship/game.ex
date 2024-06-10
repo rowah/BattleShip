@@ -6,7 +6,11 @@ defmodule BattleShip.Game do
     shutdown: 5000,
     type: :worker
 
-  alias BattleShip.{Board, Coordinate, Guesses, Rules, Ship}
+  alias BattleShip.Board
+  alias BattleShip.Coordinate
+  alias BattleShip.Guesses
+  alias BattleShip.Rules
+  alias BattleShip.Ship
 
   @players [:player1, :player2]
 
@@ -43,8 +47,7 @@ defmodule BattleShip.Game do
   def position_ship(game, player, ship_key, row, col) when player in @players,
     do: GenServer.call(game, {:position_ship, player, ship_key, row, col})
 
-  def set_ships(game, player) when player in @players,
-    do: GenServer.call(game, {:set_ships, player})
+  def set_ships(game, player) when player in @players, do: GenServer.call(game, {:set_ships, player})
 
   @spec guess_coordinate(
           pid(),

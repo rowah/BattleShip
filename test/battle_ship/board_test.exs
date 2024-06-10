@@ -1,8 +1,9 @@
 defmodule BattleShip.BoardTest do
   use ExUnit.Case
-  doctest BattleShip
 
   alias BattleShip.Board
+
+  doctest BattleShip
 
   test "returns a new board" do
     assert Board.new() == %{}

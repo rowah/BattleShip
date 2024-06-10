@@ -1,9 +1,10 @@
 defmodule BattleShip.ShipTest do
   use ExUnit.Case
-  doctest BattleShip
 
   alias BattleShip.Coordinate
   alias BattleShip.Ship
+
+  doctest BattleShip
 
   test "create new ship with valid coordinates" do
     dot_ship_type = :dot
