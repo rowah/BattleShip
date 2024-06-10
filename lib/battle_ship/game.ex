@@ -2,6 +2,7 @@ defmodule BattleShip.Game do
   @moduledoc false
 
   use GenServer,
+    start: {__MODULE__, :start_link, []},
     restart: :transient,
     shutdown: 5000,
     type: :worker
