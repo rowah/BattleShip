@@ -41,7 +41,10 @@ defmodule BattleShip.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.18", only: :test},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
+      {:styler, "~> 1.0.0-rc.0", only: [:dev, :test], runtime: false},
+      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
@@ -50,9 +53,24 @@ defmodule BattleShip.MixProject do
   defp aliases do
     [
       ci: [
-        "ci.code_quality",
-        "ci.test"
+        "deps.unlock --check-unused",
+        "deps.audit",
+        "hex.audit",
+        "sobelow --config .sobelow-conf",
+        "format --check-formatted",
+        "cmd npx prettier -c .",
+        "compile --force --warnings-as-errors",
+        "credo --strict",
+        "dialyzer",
+        "cover.full"
       ],
+      "cover.full": [
+        "coveralls"
+      ],
+      "cover.full_html": [
+        "coveralls.html"
+      ],
+      prettier: ["cmd npx prettier -w ."],
       "ci.deps_and_security": ["sobelow --config .sobelow-config"],
       "ci.code_quality": [
         "compile --force --warnings-as-errors",

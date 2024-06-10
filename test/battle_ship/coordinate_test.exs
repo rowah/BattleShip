@@ -1,8 +1,10 @@
 defmodule BattleShip.CoordinateTest do
   use ExUnit.Case
-  doctest BattleShip
 
   alias BattleShip.Coordinate
+
+  doctest BattleShip
+
   # alias BattleShip.CoordinateFixtures
 
   test "create new valid and invalid coordinate" do

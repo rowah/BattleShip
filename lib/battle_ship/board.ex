@@ -1,7 +1,8 @@
 defmodule BattleShip.Board do
   @moduledoc false
 
-  alias BattleShip.{Coordinate, Ship}
+  alias BattleShip.Coordinate
+  alias BattleShip.Ship
 
   @spec new() :: %{}
   @doc """
@@ -28,12 +29,10 @@ defmodule BattleShip.Board do
 
   """
   def position_ship(board, key, %Ship{} = ship) do
-    case overlaps_existing_ship?(board, key, ship) do
-      true ->
-        {:error, :overlapping_ship}
-
-      false ->
-        Map.put(board, key, ship)
+    if overlaps_existing_ship?(board, key, ship) do
+      {:error, :overlapping_ship}
+    else
+      Map.put(board, key, ship)
     end
   end
 
@@ -82,12 +81,10 @@ defmodule BattleShip.Board do
   defp guess_response(:miss, board), do: {:miss, :none, :no_win, board}
 
   defp sink_check(board, key) do
-    case sunk?(board, key) do
-      true ->
-        key
-
-      false ->
-        :none
+    if sunk?(board, key) do
+      key
+    else
+      :none
     end
   end
 
@@ -98,15 +95,12 @@ defmodule BattleShip.Board do
   end
 
   defp win_check(board) do
-    case all_sunk(board) do
-      true ->
-        :win
-
-      false ->
-        :no_win
+    if all_sunk(board) do
+      :win
+    else
+      :no_win
     end
   end
 
-  defp all_sunk(board),
-    do: Enum.all?(board, fn {_key, ship} -> Ship.sunk?(ship) end)
+  defp all_sunk(board), do: Enum.all?(board, fn {_key, ship} -> Ship.sunk?(ship) end)
 end

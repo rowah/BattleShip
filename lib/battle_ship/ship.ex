@@ -2,7 +2,8 @@ defmodule BattleShip.Ship do
   @moduledoc """
   This is the Ship module.
   """
-  alias BattleShip.{Coordinate, Ship}
+  alias BattleShip.Coordinate
+  alias BattleShip.Ship
 
   @enforce_keys [:coordinates, :hit_coordinates]
   defstruct [:coordinates, :hit_coordinates]
@@ -22,9 +23,6 @@ defmodule BattleShip.Ship do
     with [_ | _] = offsets <- offset(type),
          %MapSet{} = coordinates <- add_coordinates(offsets, upper_left) do
       {:ok, %Ship{coordinates: coordinates, hit_coordinates: MapSet.new()}}
-    else
-      error ->
-        error
     end
   end
 
@@ -52,8 +50,7 @@ defmodule BattleShip.Ship do
   end
 
   @spec overlaps?(struct(), struct()) :: boolean()
-  def overlaps?(existing_ship, new_ship),
-    do: not MapSet.disjoint?(existing_ship.coordinates, new_ship.coordinates)
+  def overlaps?(existing_ship, new_ship), do: not MapSet.disjoint?(existing_ship.coordinates, new_ship.coordinates)
 
   @spec guess(struct(), struct()) ::
           :miss
@@ -64,13 +61,11 @@ defmodule BattleShip.Ship do
                optional(any()) => any()
              }}
   def guess(ship, coordinate) do
-    case MapSet.member?(ship.coordinates, coordinate) do
-      true ->
-        hit_coordinates = MapSet.put(ship.hit_coordinates, coordinate)
-        {:hit, %{ship | hit_coordinates: hit_coordinates}}
-
-      false ->
-        :miss
+    if MapSet.member?(ship.coordinates, coordinate) do
+      hit_coordinates = MapSet.put(ship.hit_coordinates, coordinate)
+      {:hit, %{ship | hit_coordinates: hit_coordinates}}
+    else
+      :miss
     end
   end
 

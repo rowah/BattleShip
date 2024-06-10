@@ -1,5 +1,6 @@
 defmodule BattleShip.RulesTest do
   use ExUnit.Case
+
   doctest BattleShip
 
   test "create a new set of rules" do
