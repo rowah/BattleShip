@@ -10,7 +10,8 @@ defmodule BattleShip.Application do
     children = [
       # Starts a worker by calling: BattleShip.Worker.start_link(arg)
       # {BattleShip.Worker, arg}
-      {Registry, keys: :unique, name: Registry.Game}
+      {Registry, keys: :unique, name: Registry.Game},
+      BattleShip.GameSupervisor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
