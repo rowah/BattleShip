@@ -39,9 +39,8 @@ defmodule BattleShip.Game do
              rules: struct()
            }}
   def init(name) do
-    player1 = %{name: name, board: Board.new(), guesses: Guesses.new()}
-    player2 = %{name: nil, board: Board.new(), guesses: Guesses.new()}
-    {:ok, %{player1: player1, player2: player2, rules: %Rules{}}, @timeout}
+    send(self(), {:set_state, name})
+    {:ok, fresh_state(name)}
   end
 
   @spec add_player(pid(), binary()) :: :error | {:reply, :ok, %{}}
@@ -60,6 +59,13 @@ defmodule BattleShip.Game do
         ) :: :error | {:reply, :ok, %{}}
   def guess_coordinate(game, player, row, col) when player in @players,
     do: GenServer.call(game, {:guess_coordinate, player, row, col})
+
+  def terminate({:shutdown, :timeout}, state_data) do
+    :ets.delete(:game_state, state_data.player1.name)
+    :ok
+  end
+
+  def terminate(_reason, _state), do: :ok
 
   def handle_call({:guess_coordinate, player, row, col}, _from, state_data) do
     opponent = opponent(player)
@@ -141,11 +147,25 @@ defmodule BattleShip.Game do
     {:stop, {:shutdown, :timeout}, state_data}
   end
 
+  def handle_info({:set_state, name}, _state_data) do
+    state_data =
+      case :ets.lookup(:game_state, name) do
+        [] -> fresh_state(name)
+        [{_key, state}] -> state
+      end
+
+    :ets.insert(:game_state, {name, state_data})
+    {:noreply, state_data, @timeout}
+  end
+
   defp update_player2_name(state_data, name), do: put_in(state_data.player2.name, name)
 
   defp update_rules(state_data, rules), do: %{state_data | rules: rules}
 
-  defp reply_success(state_data, reply), do: {:reply, reply, state_data, @timeout}
+  defp reply_success(state_data, reply) do
+    :ets.insert(:game_state, {state_data.player1.name, state_data})
+    {:reply, reply, state_data, @timeout}
+  end
 
   defp update_board(state_data, player, board),
     do: Map.update!(state_data, player, fn player -> %{player | board: board} end)
@@ -159,5 +179,11 @@ defmodule BattleShip.Game do
     update_in(state_data[player].guesses, fn guesses ->
       Guesses.add(guesses, hit_or_miss, coordinate)
     end)
+  end
+
+  defp fresh_state(name) do
+    player1 = %{name: name, board: Board.new(), guesses: Guesses.new()}
+    player2 = %{name: nil, board: Board.new(), guesses: Guesses.new()}
+    %{player1: player1, player2: player2, rules: %Rules{}}
   end
 end

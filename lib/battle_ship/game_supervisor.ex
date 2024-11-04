@@ -12,6 +12,7 @@ defmodule BattleShip.GameSupervisor do
   def start_game(name), do: Supervisor.start_child(GameSupervisor, [name])
 
   def stop_game(name) do
+    :ets.delete(:game_state, name)
     Supervisor.terminate_child(GameSupervisor, pid_from_name(name))
   end
 
