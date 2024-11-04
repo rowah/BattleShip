@@ -2,14 +2,14 @@ defmodule BattleShip.Ship do
   @moduledoc """
   This is the Ship module.
   """
+  alias __MODULE__
   alias BattleShip.Coordinate
-  alias BattleShip.Ship
 
   @enforce_keys [:coordinates, :hit_coordinates]
   defstruct [:coordinates, :hit_coordinates]
 
   @doc """
-  Gives a game board.
+  Gives a game ship.
 
   Returns `%{:ok, %BattleShip.Ship{}}`.
 

@@ -2,8 +2,9 @@ defmodule BattleShip.Guesses do
   @moduledoc """
   This is the Guesses module.
   """
+
+  alias __MODULE__
   alias BattleShip.Coordinate
-  alias BattleShip.Guesses
 
   @enforce_keys [:hits, :misses]
   defstruct [:hits, :misses]
