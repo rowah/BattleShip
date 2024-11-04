@@ -60,6 +60,13 @@ defmodule BattleShip.Game do
   def guess_coordinate(game, player, row, col) when player in @players,
     do: GenServer.call(game, {:guess_coordinate, player, row, col})
 
+  def terminate({:shutdown, :timeout}, state_data) do
+    :ets.delete(:game_state, state_data.player1.name)
+    :ok
+  end
+
+  def terminate(_reason, _state), do: :ok
+
   def handle_call({:guess_coordinate, player, row, col}, _from, state_data) do
     opponent = opponent(player)
     opponent_board = player_board(state_data, opponent)
